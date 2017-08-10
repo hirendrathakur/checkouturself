@@ -24,7 +24,7 @@ object IPService {
   private val CASCADE_FILE_FULL_BODY = getClass.getResource("/haarcascade_fullbody.xml").getPath
   private val CASCADE_FILE_HS = getClass.getResource("/HS.xml").getPath
   private val CASCADE_FILE_FACE = getClass.getResource("/haarcascade_frontalface_default.xml").getPath
-  private var personShoulderPoints:(Point, Point) = (new Point(613,313), new Point(855,613))
+  private var personShoulderPoints:(Point, Point) = (new Point(613,313), new Point(855,313))
   val Y_MIN  = 80
   val Y_MAX  = 255
   val Cb_MIN = 85
@@ -98,9 +98,13 @@ object IPService {
   }
 
 
-  def neckMidPoint(file: String): Point = {
-
+  def neckMidPoint(file: String ) {
     val image = Highgui.imread(file)
+    neckMidPoint(image)
+  }
+
+  def neckMidPoint(image:Mat): Point = {
+
     val hsDetector = new CascadeClassifier(CASCADE_FILE_HS)
     val faceDetector = new CascadeClassifier(CASCADE_FILE_FACE)
 
@@ -225,20 +229,35 @@ object IPService {
     Math.sqrt(x + y)
   }
 
-  def putOnDress(person:Mat, dress:Mat, shoulder:(Point, Point), strap:(Point, Point)): Mat ={
+
+  def shouldMid(dressImage: Mat): Point = {
+    val l = leftShoulder(dressImage)
+    val r = rightShoulder(dressImage)
+    new Point((l.x + r.x) / 2, (l.y + r.y) / 2)
+
+  }
+
+  def putOnDress(person:Mat, dress:Mat, shoulder:(Point, Point)): Mat ={
     //shoulder point left, right
     //dress left, dress right
 
     val shoulderDistance = distance( shoulder._1, shoulder._2)
-//    val strapDistance = distance( strap._1, strap._2)
+    val strap = shoulders( dress)
+    val strapDistace = distance(strap._1, strap._2)
     println("shoulderDistance",shoulderDistance)
 //    println("strapDistance",strapDistance)
     val (newDHeight, newDWdith) = {
+
       val ratio =   dress.height().toDouble / dress.width()
       println(ratio)
-      val targetWidth = shoulderDistance //* dress.width() / shoulderDistance
+
+      val d = if (strapDistace > shoulderDistance ) strapDistace/ shoulderDistance else shoulderDistance / strapDistace
+      val targetWidth =    dress.width()  / d
       val targetHeight = targetWidth * ratio
       targetHeight -> targetWidth
+
+
+
     }
 
     println(dress.height(),dress.width())
@@ -253,7 +272,14 @@ object IPService {
 
     val newStaps = shoulders(resizeimage)
 
-    val startPOint =  new Point(shoulder._1.x - newStaps._1.x + 25 ,shoulder._1.y - newStaps._1.y - 20)  //new Point(0,0)
+    //
+    val neckPoint = neckMidPoint(person)
+    val shoulderMidpoint =shouldMid(resizeimage)
+
+
+
+    val startPOint = new Point( neckPoint.x - shoulderMidpoint.x ,neckPoint.y  - shoulderMidpoint.y)
+//    val startPOint =  new Point(shoulder._1.x - newStaps._1.x + 25 ,shoulder._1.y - newStaps._1.y - 20)  //new Point(0,0)
 
     for(i <- startPOint.x.toInt to startPOint.x.toInt + resizeimage.width()){
       for (j <- startPOint.y.toInt to startPOint.y.toInt + resizeimage.height()){
@@ -304,11 +330,11 @@ object IPService {
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
     val person = imageResources + "people/img2.jpg"
-//    detectBody(person)
+    detectBody(person)
     val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
     println("personShoulderPoints",personShoulderPoints)
-    val dress = Highgui.imread(imageResources + "dresses/dress4.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
-    val res = putOnDress(src, dress,personShoulderPoints, null)
+    val dress = Highgui.imread(imageResources + "dresses/dress5.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val res = putOnDress(src, dress,personShoulderPoints)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
   }
