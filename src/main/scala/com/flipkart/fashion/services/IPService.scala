@@ -133,6 +133,8 @@ object IPService {
     Imgproc.cvtColor(personImage,personImage, Imgproc.COLOR_RGB2RGBA)
     val dressImage = Highgui.imread(dressFile, Highgui.CV_LOAD_IMAGE_UNCHANGED)
 
+
+
     val output =  Mat.zeros( personImage.size(), CvType.CV_8UC4 )
     IPJService.overlayImage(personImage, dressImage, output, new Point(0,0))
 
@@ -140,14 +142,62 @@ object IPService {
 
   }
 
+  def distance(point1:Point, point2 : Point): Double = {
+    val x = Math.pow(point2.x - point1.x, 2)
+    val y = Math.pow(point2.y - point1.y, 2)
+    Math.sqrt(x + y)
+  }
 
+  def putOnDress(person:Mat, dress:Mat, shoulder:(Point, Point), strap:(Point, Point)): Mat ={
+    //shoulder point left, right
+    //dress left, dress right
+    val dressSize = dress.width()
+    val shoulderDistance = distance( shoulder._1, shoulder._2)
+    println("shoulderDistance",shoulderDistance)
+    val (newDHeight, newDWdith) = {
+      val ratio =   dress.height().toDouble / dress.width()
+      println(ratio)
+      val targetWidth = shoulderDistance
+      val targetHeight = targetWidth * ratio
+      targetHeight -> targetWidth
+    }
+
+    println(dress.height(),dress.width())
+    println(newDHeight,newDWdith)
+
+    val resizeimage = new Mat
+    Imgproc.resize(dress, resizeimage, new Size(newDWdith, newDHeight))
+    Imgproc.cvtColor(person,person, Imgproc.COLOR_RGB2RGBA)
+
+    val finalImage = person.clone()
+    println("shoulderPOint, Overlay", shoulder._1)
+
+    val startPOint =  shoulder._1 //new Point(0,0)
+//    IPJService.overlayImage(person,resizeimage, finalImage,startPOint)
+
+    for(i <- startPOint.x.toInt to startPOint.x.toInt + resizeimage.width()){
+      for (j <- startPOint.y.toInt to startPOint.y.toInt + resizeimage.height()){
+        val overayPoint = resizeimage.get(j - startPOint.y.toInt, i - startPOint.x.toInt)
+        if(overayPoint != null && overayPoint(3) > 0)
+          finalImage.put(j,i, overayPoint:_ *)
+      }
+    }
+
+    println("resizeimage", resizeimage.size())
+
+    finalImage
+  }
 
 
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
-    detectBody(imageResources + "people/img2.jpg")
-    copyImage(imageResources + "people/img2.jpg", imageResources + "dresses/dress1.png", imageResources + "result1.png")
+//    detectBody(imageResources + "people/img2.jpg")
+//    copyImage(imageResources + "people/img2.jpg", imageResources + "dresses/dress1.png", imageResources + "result1.png")
+val src = Highgui.imread(imageResources + "people/img2.jpg", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val dress = Highgui.imread(imageResources + "dresses/dress1.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val res = putOnDress(src, dress, (new Point(613,313), new Point(855,613)), null)
+    Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
   }
 
