@@ -3,6 +3,7 @@ package com.flipkart.fashion.services
 import java.util
 
 import com.flipkart.fashion.BuildInfo
+import com.flipkart.fashion.services.IPService.testGrid
 import nu.pattern.OpenCV
 import org.opencv.core._
 import org.opencv.highgui.Highgui
@@ -276,7 +277,36 @@ object IPService {
     finalImage
   }
 
+  def getWaist(drawing: Mat): Unit = {
+    val upperBodyDetections = new MatOfRect
+    val lowerBodyDetections = new MatOfRect
 
+    // Middle of upperBody part and lowerBody part
+    val midUpper = new Point(upperBodyDetections.toArray.head.x + upperBodyDetections.toArray.head.width / 2, (upperBodyDetections.toArray.head.y + upperBodyDetections.toArray.head.height))
+    val midLower = new Point(lowerBodyDetections.toArray.head.x + lowerBodyDetections.toArray.head.width / 2, (lowerBodyDetections.toArray.head.y))
+    Core.line(drawing, midUpper, midLower, new Scalar(255, 255, 255))
+
+    val waistMiddleY = (midLower.y + midUpper.y) / 2
+    val waistMiddlePoint = new Point(midUpper.x, waistMiddleY)
+
+    Core.circle(drawing, waistMiddlePoint, 50, new Scalar(255, 255, 255))
+
+    for (i <- waistMiddlePoint.x.toInt to upperBodyDetections.toArray.head.x by -1) {
+      val tempPoint = new Point(i, waistMiddleY)
+      if(testGrid(tempPoint, drawing)){
+        Core.circle(drawing, tempPoint, 50, new Scalar(255, 255, 255))
+      }
+    }
+  }
+
+  def testGrid(point: Point, mat: Mat) : Boolean = {
+    for (i <- point.x.toInt - 3  to point.y.toInt + 3 ){
+      for (j <- point.y.toInt -3 to point.y.toInt + 3) {
+        return true
+      }
+    }
+    false
+  }
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
