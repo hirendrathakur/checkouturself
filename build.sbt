@@ -36,4 +36,9 @@ libraryDependencies ++= Seq(
   "commons-io" % "commons-io" % "2.5"
 )
 
+enablePlugins(BuildInfoPlugin)
+
+buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, baseDirectory)
+buildInfoPackage := "com.flipkart.fashion"
+
 mainClass in (Compile, run) := Some("com.flipkart.fashion.Boot")

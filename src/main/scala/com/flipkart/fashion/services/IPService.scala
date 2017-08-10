@@ -1,14 +1,13 @@
 package com.flipkart.fashion.services
 
-import java.io.File
 import java.util
 
+import com.flipkart.fashion.BuildInfo
 import nu.pattern.OpenCV
+import org.opencv.core._
 import org.opencv.highgui.Highgui
 import org.opencv.imgproc.Imgproc
-import org.opencv.objdetect.{Objdetect, CascadeClassifier}
-import org.opencv.core._
-import sun.jvm.hotspot.utilities.BitMap
+import org.opencv.objdetect.{CascadeClassifier, Objdetect}
 
 // Draw a bounding box around each face.
 import scala.collection.JavaConversions._
@@ -126,7 +125,8 @@ object IPService {
   }
 
   def main(args: Array[String]): Unit = {
-    detectBody("/Users/aman.shrivastava/Documents/codebase/checkouturself/resources/img2.jpg")
+    val imageResources = BuildInfo.baseDirectory + "/resources/"
+    detectBody(imageResources + "img2.jpg")
     //detectBody("/Users/hirendra.thakur/Downloads/1.jpg")
   }
 
