@@ -1,11 +1,13 @@
 package com.flipkart.fashion.services
 
 import java.io.File
+import java.util
 
 import nu.pattern.OpenCV
 import org.opencv.highgui.Highgui
+import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.CascadeClassifier
-import org.opencv.core.{Core, MatOfRect, Point, Scalar}
+import org.opencv.core._
 // Draw a bounding box around each face.
 import scala.collection.JavaConversions._
 
@@ -33,9 +35,28 @@ object IPService {
       Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0))
     }
 
-    Highgui.imwrite(s"/Users/$username/Pictures/result.jpg", image)
+    //Highgui.imwrite(s"/Users/$username/Pictures/result.jpg", image)
 
 
+    val image_src: Mat = image.clone()
+    Imgproc.cvtColor(image, image_src, Imgproc.COLOR_BGR2GRAY)
+    Imgproc.blur(image_src, image_src, new Size(3,3))
+    val canny_out: Mat = image.clone()
+    Imgproc.Canny(image_src,canny_out, 100, 200, 3, false)
+    val contours = new util.ArrayList[MatOfPoint]()
+    val hierarchy = new Mat()
+    Imgproc.findContours(canny_out,contours,hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0))
+
+    /// Draw contours
+    val drawing = Mat.zeros( canny_out.size(), CvType.CV_8UC3 )
+    for(  i <- 0 until  contours.size()  )
+    {
+      val color = new Scalar( 125, 200, 225 )
+      Imgproc.drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, new Point(0,0) )
+    }
+
+
+    Highgui.imwrite(s"/Users/$username/Pictures/result_gray.jpg", drawing)
     /// Convert image to gray and blur it
 //
 //    cvtColor(src, src_gray, CV_BGR2GRAY)
@@ -44,7 +65,7 @@ object IPService {
   }
 
   def main(args: Array[String]): Unit = {
-    detectBody("/Users/kinshuk.bairagi/Documents/fashion-hackday/checkouturself/resources/img2.jpg")
+    detectBody("/Users/hirendra.thakur/practiceWorkspace/checkouturself/resources/img2.jpg")
   }
 
 }
