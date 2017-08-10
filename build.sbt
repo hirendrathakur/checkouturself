@@ -13,8 +13,7 @@ resolvers ++= Seq(
   "typesafe" at "http://repo.typesafe.com/typesafe/releases/",
   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases",
   "jBoss" at "http://repository.jboss.org/nexus/content/groups/public",
-  "Akka Snapshot Repository" at "http://repo.typesafe.com/typesafe/snapshots/",
-  "opencv" at "http://maven2.javacv.googlecode.com/git/"
+  "Akka Snapshot Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
 )
 
 /** all akka only **/
@@ -35,5 +34,6 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.37",
   "org.apache.commons" % "commons-dbcp2" % "2.1.1",
   "javax.persistence" % "persistence-api" % "1.0.2",
-  "org.springframework" % "spring-jdbc" % "4.2.3.RELEASE"
+  "org.springframework" % "spring-jdbc" % "4.2.3.RELEASE",
+  "org.bytedeco" % "javacv-platform" % "1.3.3"
 )
