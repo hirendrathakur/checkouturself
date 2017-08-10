@@ -30,4 +30,5 @@ object Boot extends App with CORSDirectives{
   """.stripMargin)
 
 	Http().bindAndHandle(cors(new Routes().route), "0.0.0.0", 9090)
+
 }
