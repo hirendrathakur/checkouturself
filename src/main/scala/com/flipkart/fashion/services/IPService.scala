@@ -6,8 +6,10 @@ import java.util
 import nu.pattern.OpenCV
 import org.opencv.highgui.Highgui
 import org.opencv.imgproc.Imgproc
-import org.opencv.objdetect.CascadeClassifier
+import org.opencv.objdetect.{Objdetect, CascadeClassifier}
 import org.opencv.core._
+import sun.jvm.hotspot.utilities.BitMap
+
 // Draw a bounding box around each face.
 import scala.collection.JavaConversions._
 
@@ -20,43 +22,99 @@ object IPService {
 
   private val username = System.getProperty("user.name")
   private val CASCADE_FILE_FULL_BODY = getClass.getResource("/haarcascade_fullbody.xml").getPath
+  private val CASCADE_FILE_HS = getClass.getResource("/HS.xml").getPath
+  private val CASCADE_FILE_FACE = getClass.getResource("/haarcascade_frontalface_default.xml").getPath
+  val Y_MIN  = 80
+  val Y_MAX  = 255
+  val Cb_MIN = 85
+  val Cb_MAX = 135
+  val Cr_MIN = 135
+  val Cr_MAX = 180
+
 
   def detectBody(file:String): Unit ={
 
     val image = Highgui.imread(file)
     val bodyDetector = new CascadeClassifier(CASCADE_FILE_FULL_BODY)
+    val hsDetector = new CascadeClassifier(CASCADE_FILE_HS)
+    val faceDetector = new CascadeClassifier(CASCADE_FILE_FACE)
+
+    val imageHeight = image.height()
+    val humanHeight = imageHeight * 0.7
 
     val bodyDetections = new MatOfRect
-    bodyDetector.detectMultiScale(image, bodyDetections)
+    val hsDetections = new MatOfRect
+    val faceDetections = new MatOfRect
+    hsDetector.detectMultiScale(image, hsDetections)
+//    bodyDetector.detectMultiScale(image, bodyDetections, 1.01, 2, Objdetect.CASCADE_SCALE_IMAGE , new Size(200,humanHeight), new Size())
+    println("Detected "+hsDetections.toArray.length+" body")
 
-    println("Detected "+bodyDetections.toArray.length+" body")
 
-    for (rect <- bodyDetections.toArray) {
-      Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0))
+
+    val image_bw: Mat = image.clone()
+    val image_skin: Mat = image.clone()
+
+    Imgproc.cvtColor(image, image_bw, Imgproc.COLOR_BGR2YCrCb)
+    Core.inRange(image_bw, new Scalar(Y_MIN, Cr_MIN, Cb_MIN), new Scalar(Y_MAX, Cr_MAX, Cb_MAX), image_skin)
+
+
+    var reactag:Rect = null
+    for ( rect <- hsDetections.toArray) {
+      reactag = rect
+      println("rect" , "x=",reactag.x, "Y=" ,reactag.y)
+      Core.rectangle(image_skin, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
     }
 
-    //Highgui.imwrite(s"/Users/$username/Pictures/result.jpg", image)
+    Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
 
+    faceDetector.detectMultiScale(image_skin, faceDetections)
+    for ( rect <- faceDetections.toArray) {
+      Core.rectangle(image_skin, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
+    }
 
-    val image_src: Mat = image.clone()
-    Imgproc.cvtColor(image, image_src, Imgproc.COLOR_BGR2GRAY)
-    Imgproc.blur(image_src, image_src, new Size(3,3))
+    Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
+    println("H=", image_skin.height(), "W=" , image_skin.width)
+    println("rect" , "x=",reactag.x, "Y=" ,reactag.y)
+
+    for (i <- 0 until image_skin.height()){
+      for(j <- 0 until image_skin.width())
+         if(i <  reactag.y)
+           image_skin.put(i,j,0)
+          else if ( i > (reactag.y + reactag.height))
+           image_skin.put(i,j,0)
+         else if(j <  reactag.x)
+        image_skin.put(i,j,0)
+      else if ( j > (reactag.x + reactag.width))
+        image_skin.put(i,j,0)
+
+    }
+
+    //Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
+    Highgui.imwrite(s"/Users/$username/Pictures/image_bw.jpg", image_skin)
+//
+    Imgproc.blur(image_skin, image_skin, new Size(3,3))
     val canny_out: Mat = image.clone()
-    Imgproc.Canny(image_src,canny_out, 100, 200, 3, false)
+
+    Imgproc.Canny(image_skin,canny_out, 100, 200, 3, false)
     val contours = new util.ArrayList[MatOfPoint]()
+
     val hierarchy = new Mat()
     Imgproc.findContours(canny_out,contours,hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0))
 
     /// Draw contours
     val drawing = Mat.zeros( canny_out.size(), CvType.CV_8UC3 )
+    println(contours(0).toList.head, contours(0).toList.last)
     for(  i <- 0 until  contours.size()  )
     {
       val color = new Scalar( 125, 200, 225 )
+      println(contours(i).toList.size())
       Imgproc.drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, new Point(0,0) )
     }
 
 
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray.jpg", drawing)
+
+//    Core.rectangle(image, new Point(contours(0).toList.head.x, contours(0).toList.head.y), new Point(contours(0).toList.head.x + contours(0).toList.head.width, rect.y + rect.height), new Scalar(0, 255, 0))
     /// Convert image to gray and blur it
 //
 //    cvtColor(src, src_gray, CV_BGR2GRAY)
@@ -66,6 +124,7 @@ object IPService {
 
   def main(args: Array[String]): Unit = {
     detectBody("/Users/hirendra.thakur/practiceWorkspace/checkouturself/resources/img2.jpg")
+    //detectBody("/Users/hirendra.thakur/Downloads/1.jpg")
   }
 
 }
