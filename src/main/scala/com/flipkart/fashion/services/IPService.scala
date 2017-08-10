@@ -23,6 +23,7 @@ object IPService {
   private val CASCADE_FILE_FULL_BODY = getClass.getResource("/haarcascade_fullbody.xml").getPath
   private val CASCADE_FILE_HS = getClass.getResource("/HS.xml").getPath
   private val CASCADE_FILE_FACE = getClass.getResource("/haarcascade_frontalface_default.xml").getPath
+  private var personShoulderPoints:List[Point] = null
   val Y_MIN  = 80
   val Y_MAX  = 255
   val Cb_MIN = 85
@@ -30,7 +31,8 @@ object IPService {
   val Cr_MIN = 135
   val Cr_MAX = 180
 
-  def neckMidPoint(file: String): Unit = {
+
+  def neckMidPoint(file: String): Point = {
 
     val image = Highgui.imread(file)
     val hsDetector = new CascadeClassifier(CASCADE_FILE_HS)
@@ -58,6 +60,23 @@ object IPService {
 
   }
 
+  def getShoulderStartingX(drawing:Mat, end:Int, intersectY:Int): Int = {
+    for (i <- 0 until end) {
+      if (drawing.get(intersectY,i).toList != List(0.0, 0.0, 0.0)) {
+        return i
+      }
+    }
+    0
+  }
+
+  def getShoulderEndingX(drawing:Mat, end:Int, intersectY:Int): Int = {
+    for (i <- end to 0 by -1) {
+      if (drawing.get(intersectY,i).toList != List(0.0, 0.0, 0.0)) {
+        return i
+      }
+    }
+    0
+  }
 
   def detectBody(file:String): Unit ={
 
@@ -105,6 +124,7 @@ object IPService {
       Imgproc.drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, new Point(0,0) )
     }
 
+    val drawingShoulder = drawing.clone()
     for ( rect <- hsDetections.toArray) {
       Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
     }
@@ -120,13 +140,26 @@ object IPService {
     val point3 = new Point(hsDetections.toArray.head.x, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
     val point4 = new Point(hsDetections.toArray.head.x + hsDetections.toArray.head.width, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
 
-    Core.line(drawing, point1, point2, new Scalar(255, 255, 255))
-    Core.line(drawing, point3, point4, new Scalar(255, 255, 255))
+    //Core.line(drawing, point1, point2, new Scalar(255, 255, 255))
+    //Core.line(drawing, point3, point4, new Scalar(255, 255, 255))
 
+    val intersectX = point3.x + (point4.x-point3.x)/2
+    val intersectY = point1.y + (point2.y-point1.y)/2
+    val shoulderStartX = getShoulderStartingX(drawingShoulder, intersectX.toInt, intersectY.toInt)
+    val shoulderEndX = getShoulderEndingX(drawingShoulder, drawingShoulder.cols()-1, intersectY.toInt)
+
+    val point5 = new Point(shoulderStartX, intersectY)
+    val point6 = new Point(shoulderEndX, intersectY)
+
+    Core.line(drawingShoulder, point5, point6, new Scalar(255, 255, 255))
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray5.jpg", drawing)
-
+    Highgui.imwrite(s"/Users/$username/Pictures/person_shoulder.jpg", drawingShoulder)
+    personShoulderPoints = List(point5, point6)
+    println(personShoulderPoints)
 
   }
+
+
 
   def copyImage(personFile: String, dressFile: String, resultFile: String): Unit = {
     val personImage = Highgui.imread(personFile, Highgui.CV_LOAD_IMAGE_UNCHANGED)
