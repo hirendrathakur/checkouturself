@@ -85,11 +85,17 @@ object IPService {
       Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
     }
 
-    val point1 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, (faceDetections.toArray.head.y + faceDetections.toArray.head.height) )
-    val point2 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, (hsDetections.toArray.head.y + hsDetections.toArray.head.height) )
+    val distance = hsDetections.toArray.head.y + hsDetections.toArray.head.height - (faceDetections.toArray.head.y + faceDetections.toArray.head.height)
+    val point1 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, faceDetections.toArray.head.y + faceDetections.toArray.head.height )
+    val point2 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, hsDetections.toArray.head.y + hsDetections.toArray.head.height )
+
+    val point3 = new Point(hsDetections.toArray.head.x, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
+    val point4 = new Point(hsDetections.toArray.head.x + hsDetections.toArray.head.width, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
 
     Core.line(drawing, point1, point2, new Scalar(255, 255, 255))
-    Highgui.imwrite(s"/Users/$username/Pictures/result_gray.jpg", drawing)
+    Core.line(drawing, point3, point4, new Scalar(255, 255, 255))
+
+    Highgui.imwrite(s"/Users/$username/Pictures/result_gray5.jpg", drawing)
 
 //    Core.rectangle(image, new Point(contours(0).toList.head.x, contours(0).toList.head.y), new Point(contours(0).toList.head.x + contours(0).toList.head.width, rect.y + rect.height), new Scalar(0, 255, 0))
     /// Convert image to gray and blur it
@@ -99,10 +105,13 @@ object IPService {
 
   }
 
+  def copyImage(personFile: String, dressFile: String): Unit = {
+
+  }
+
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
     detectBody(imageResources + "img2.jpg")
-    //detectBody("/Users/hirendra.thakur/Downloads/1.jpg")
   }
 
 }
