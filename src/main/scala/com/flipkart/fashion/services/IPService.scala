@@ -24,7 +24,7 @@ object IPService {
   private val CASCADE_FILE_FULL_BODY = getClass.getResource("/haarcascade_fullbody.xml").getPath
   private val CASCADE_FILE_HS = getClass.getResource("/HS.xml").getPath
   private val CASCADE_FILE_FACE = getClass.getResource("/haarcascade_frontalface_default.xml").getPath
-  private var personShoulderPoints:List[Point] = null
+  private var personShoulderPoints:(Point, Point) = (new Point(613,313), new Point(855,613))
   val Y_MIN  = 80
   val Y_MAX  = 255
   val Cb_MIN = 85
@@ -212,7 +212,7 @@ object IPService {
     Core.line(drawingShoulder, point5, point6, new Scalar(255, 255, 255))
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray5.jpg", drawing)
     Highgui.imwrite(s"/Users/$username/Pictures/person_shoulder.jpg", drawingShoulder)
-    personShoulderPoints = List(point5, point6)
+    personShoulderPoints = (point5, point6)
     println(personShoulderPoints)
 
   }
@@ -230,9 +230,9 @@ object IPService {
     //dress left, dress right
 
     val shoulderDistance = distance( shoulder._1, shoulder._2)
-    val strapDistance = distance( strap._1, strap._2)
+//    val strapDistance = distance( strap._1, strap._2)
     println("shoulderDistance",shoulderDistance)
-    println("strapDistance",strapDistance)
+//    println("strapDistance",strapDistance)
     val (newDHeight, newDWdith) = {
       val ratio =   dress.height().toDouble / dress.width()
       println(ratio)
@@ -303,11 +303,12 @@ object IPService {
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
-//    detectBody(imageResources + "people/img2.jpg")
-//    copyImage(imageResources + "people/img2.jpg", imageResources + "dresses/dress1.png", imageResources + "result1.png")
-val src = Highgui.imread(imageResources + "people/img2.jpg", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val person = imageResources + "people/img2.jpg"
+//    detectBody(person)
+    val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    println("personShoulderPoints",personShoulderPoints)
     val dress = Highgui.imread(imageResources + "dresses/dress4.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
-    val res = putOnDress(src, dress, (new Point(613,313), new Point(855,613)), (new Point(181,109), new Point(402,107)))
+    val res = putOnDress(src, dress,personShoulderPoints, null)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
   }
