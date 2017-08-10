@@ -1,9 +1,6 @@
 name := "checkouturself"
-
 organization := "com.flipkart.fashion"
-
 version := "0.0.1"
-
 scalaVersion := "2.11.7"
 
 resolvers ++= Seq(
@@ -37,3 +34,5 @@ libraryDependencies ++= Seq(
   "org.springframework" % "spring-jdbc" % "4.2.3.RELEASE",
   "org.bytedeco" % "javacv-platform" % "1.3.3"
 )
+
+mainClass in (Compile, run) := Some("com.flipkart.fashion.Boot")
