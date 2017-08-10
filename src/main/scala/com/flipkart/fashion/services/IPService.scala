@@ -110,16 +110,25 @@ object IPService {
     val dressImage = Highgui.imread(dressFile, Highgui.CV_LOAD_IMAGE_UNCHANGED)
 
     personImage.copyTo(dressImage)
-    Highgui.imwrite(resultFile, dressImage)
+    println(dressImage.channels())
+    println(dressImage.get(10,10).toList)
 
+    val output = personImage.clone()
+
+    IPJService.overlayImage(personImage, dressImage, output, new Point(0,0))
+
+    Highgui.imwrite(resultFile, output)
 
   }
+
+
+
+
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
     detectBody(imageResources + "people/img2.jpg")
     copyImage(imageResources + "people/img2.jpg", imageResources + "dresses/dress1.png", imageResources + "result1.png")
-    copyImage(imageResources + "dresses/dress1.png", imageResources + "people/img2.jpg", imageResources + "result2.png")
 
   }
 
