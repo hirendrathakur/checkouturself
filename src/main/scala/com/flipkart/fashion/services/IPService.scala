@@ -124,13 +124,14 @@ object IPService {
       Imgproc.drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, new Point(0,0) )
     }
 
-//    for ( rect <- hsDetections.toArray) {
-//      Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
-//    }
-//
-//    for ( rect <- faceDetections.toArray) {
-//      Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
-//    }
+    val drawingShoulder = drawing.clone()
+    for ( rect <- hsDetections.toArray) {
+      Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
+    }
+
+    for ( rect <- faceDetections.toArray) {
+      Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
+    }
 
     val distance = hsDetections.toArray.head.y + hsDetections.toArray.head.height - (faceDetections.toArray.head.y + faceDetections.toArray.head.height)
     val point1 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, faceDetections.toArray.head.y + faceDetections.toArray.head.height )
@@ -144,14 +145,15 @@ object IPService {
 
     val intersectX = point3.x + (point4.x-point3.x)/2
     val intersectY = point1.y + (point2.y-point1.y)/2
-    val shoulderStartX = getShoulderStartingX(drawing, intersectX.toInt, intersectY.toInt)
-    val shoulderEndX = getShoulderEndingX(drawing, drawing.cols()-1, intersectY.toInt)
+    val shoulderStartX = getShoulderStartingX(drawingShoulder, intersectX.toInt, intersectY.toInt)
+    val shoulderEndX = getShoulderEndingX(drawingShoulder, drawingShoulder.cols()-1, intersectY.toInt)
 
     val point5 = new Point(shoulderStartX, intersectY)
     val point6 = new Point(shoulderEndX, intersectY)
 
-    Core.line(drawing, point5, point6, new Scalar(255, 255, 255))
+    Core.line(drawingShoulder, point5, point6, new Scalar(255, 255, 255))
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray5.jpg", drawing)
+    Highgui.imwrite(s"/Users/$username/Pictures/person_shoulder.jpg", drawingShoulder)
     personShoulderPoints = List(point5, point6)
     println(personShoulderPoints)
 
