@@ -30,6 +30,34 @@ object IPService {
   val Cr_MIN = 135
   val Cr_MAX = 180
 
+  def neckMidPoint(file: String): Unit = {
+
+    val image = Highgui.imread(file)
+    val hsDetector = new CascadeClassifier(CASCADE_FILE_HS)
+    val faceDetector = new CascadeClassifier(CASCADE_FILE_FACE)
+
+    val hsDetections = new MatOfRect
+    val faceDetections = new MatOfRect
+    hsDetector.detectMultiScale(image, hsDetections)
+    //    bodyDetector.detectMultiScale(image, bodyDetections, 1.01, 2, Objdetect.CASCADE_SCALE_IMAGE , new Size(200,humanHeight), new Size())
+
+    val image_bw: Mat = image.clone()
+
+    Imgproc.cvtColor(image, image_bw, Imgproc.COLOR_BGR2GRAY)
+    //    Core.inRange(image_bw, new Scalar(Y_MIN, Cr_MIN, Cb_MIN), new Scalar(Y_MAX, Cr_MAX, Cb_MAX), image_skin)
+
+    faceDetector.detectMultiScale(image_bw, faceDetections, 1.01, 2, Objdetect.CASCADE_FIND_BIGGEST_OBJECT , new Size(), new Size())
+
+    Highgui.imwrite(s"/Users/$username/Pictures/image_bw.jpg", image_bw)
+    Imgproc.blur(image_bw, image_bw, new Size(3,3))
+    val canny_out: Mat = image.clone()
+
+    val distance = hsDetections.toArray.head.y + hsDetections.toArray.head.height - (faceDetections.toArray.head.y + faceDetections.toArray.head.height)
+
+    new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
+
+  }
+
 
   def detectBody(file:String): Unit ={
 
