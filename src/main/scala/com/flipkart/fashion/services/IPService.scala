@@ -53,40 +53,16 @@ object IPService {
     val image_bw: Mat = image.clone()
     val image_skin: Mat = image.clone()
 
-    Imgproc.cvtColor(image, image_bw, Imgproc.COLOR_BGR2YCrCb)
+    Imgproc.cvtColor(image, image_bw, Imgproc.COLOR_BGR2GRAY)
 //    Core.inRange(image_bw, new Scalar(Y_MIN, Cr_MIN, Cb_MIN), new Scalar(Y_MAX, Cr_MAX, Cb_MAX), image_skin)
 
+    faceDetector.detectMultiScale(image_bw, faceDetections, 1.01, 2, Objdetect.CASCADE_FIND_BIGGEST_OBJECT , new Size(), new Size())
 
-
-
-    Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
-
-    faceDetector.detectMultiScale(image_skin, faceDetections, 1.01, 2, Objdetect.CASCADE_FIND_BIGGEST_OBJECT , new Size(), new Size())
-
-
-    Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
-    println("H=", image_skin.height(), "W=" , image_skin.width)
-
-//    for (i <- 0 until image_skin.height()){
-//      for(j <- 0 until image_skin.width())
-//         if(i <  reactag.y)
-//           image_skin.put(i,j,0)
-//          else if ( i > (reactag.y + reactag.height))
-//           image_skin.put(i,j,0)
-//         else if(j <  reactag.x)
-//        image_skin.put(i,j,0)
-//      else if ( j > (reactag.x + reactag.width))
-//        image_skin.put(i,j,0)
-//
-//    }
-
-    //Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
-    Highgui.imwrite(s"/Users/$username/Pictures/image_bw.jpg", image_skin)
-//
-    Imgproc.blur(image_skin, image_skin, new Size(3,3))
+    Highgui.imwrite(s"/Users/$username/Pictures/image_bw.jpg", image_bw)
+    Imgproc.blur(image_bw, image_bw, new Size(3,3))
     val canny_out: Mat = image.clone()
 
-    Imgproc.Canny(image_skin,canny_out, 100, 200, 3, false)
+    Imgproc.Canny(image_bw,canny_out, 100, 200, 3, false)
     val contours = new util.ArrayList[MatOfPoint]()
 
     val hierarchy = new Mat()
@@ -98,7 +74,6 @@ object IPService {
     for(  i <- 0 until  contours.size()  )
     {
       val color = new Scalar( 125, 200, 225 )
-      println(contours(i).toList.size())
       Imgproc.drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, new Point(0,0) )
     }
 
@@ -113,7 +88,7 @@ object IPService {
     val point1 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, (faceDetections.toArray.head.y + faceDetections.toArray.head.height) )
     val point2 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, (hsDetections.toArray.head.y + hsDetections.toArray.head.height) )
 
-    Core.line(drawing, point1, point2, new Scalar(255, 255, 255));
+    Core.line(drawing, point1, point2, new Scalar(255, 255, 255))
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray.jpg", drawing)
 
 //    Core.rectangle(image, new Point(contours(0).toList.head.x, contours(0).toList.head.y), new Point(contours(0).toList.head.x + contours(0).toList.head.width, rect.y + rect.height), new Scalar(0, 255, 0))
