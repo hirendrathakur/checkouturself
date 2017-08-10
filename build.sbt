@@ -32,7 +32,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-dbcp2" % "2.1.1",
   "javax.persistence" % "persistence-api" % "1.0.2",
   "org.springframework" % "spring-jdbc" % "4.2.3.RELEASE",
-  "org.bytedeco" % "javacv-platform" % "1.3.3" withSources(),
+  "nu.pattern" % "opencv" % "2.4.9-7",
   "commons-io" % "commons-io" % "2.5"
 )
 

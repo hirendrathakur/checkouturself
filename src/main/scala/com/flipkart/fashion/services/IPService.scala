@@ -2,66 +2,48 @@ package com.flipkart.fashion.services
 
 import java.io.File
 
-import org.bytedeco.javacpp.opencv_core._
-import org.bytedeco.javacpp.opencv_imgproc._
-import org.bytedeco.javacpp.opencv_imgcodecs._
-import org.apache.commons.lang.RandomStringUtils
-import org.bytedeco.javacpp.opencv_objdetect._
+import nu.pattern.OpenCV
+import org.opencv.highgui.Highgui
+import org.opencv.objdetect.CascadeClassifier
+import org.opencv.core.{Core, MatOfRect, Point, Scalar}
+// Draw a bounding box around each face.
+import scala.collection.JavaConversions._
+
 /**
   * Created by kinshuk.bairagi on 10/08/17.
   */
 object IPService {
 
-  private val CASCADE_FILE_FULL_BODY = getClass.getResource("/haarcascade_fullbody.xml").getFile
+  OpenCV.loadShared()
+
+  private val username = System.getProperty("user.name")
+  private val CASCADE_FILE_FULL_BODY = getClass.getResource("/haarcascade_fullbody.xml").getPath
 
   def detectBody(file:String): Unit ={
-//    val tempImageName = "/tmp/" + RandomStringUtils.random(20, true, true)
-//    val imageFile = new File(tempImageName)
-//    FileUtils.copyURLToFile(imageUrl, imageFile)
 
-    val image = cvLoadImage(file)
-//    val cascadeFileNameArrayUpperBody = Array(CASCADE_FILE_UPPER_BODY_1, CASCADE_FILE_UPPER_BODY_2)
+    val image = Highgui.imread(file)
+    val bodyDetector = new CascadeClassifier(CASCADE_FILE_FULL_BODY)
 
-    val cascade = new CvHaarClassifierCascade(cvLoad(CASCADE_FILE_FULL_BODY))
-    val storage = org.bytedeco.javacpp.helper.opencv_core.AbstractCvMemStorage.create()
+    val bodyDetections = new MatOfRect
+    bodyDetector.detectMultiScale(image, bodyDetections)
 
-    val sign = cvHaarDetectObjects(image, cascade, storage, 1.1, 2 , CV_HAAR_FIND_BIGGEST_OBJECT , null, null)
-//    val sign = cvHaarDetectObjects(image, cascade, storage,1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_DO_ROUGH_SEARCH, null, null)
-    cvClearMemStorage(storage)
+    println("Detected "+bodyDetections.toArray.length+" body")
 
-    println(sign.total())
-    println(sign.first())
-
-    // We can allocate native arrays using constructors taking an integer as argument.
-    val hatPoints = new CvPoint(3)
-
-    for ( i <- 1 to sign.total()) {
-      val r = new CvRect(cvGetSeqElem(sign, i))
-      val x = r.x
-      val y = r.y
-      val w = r.width
-      val h = r.height
-      cvRectangle(image, cvPoint(x, y), cvPoint(x + w, y + h), org.bytedeco.javacpp.helper.opencv_core.CV_RGB(255,0,0), 1, CV_AA, 0)
-
+    for (rect <- bodyDetections.toArray) {
+      Core.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0))
     }
 
+    Highgui.imwrite(s"/Users/$username/Pictures/result.jpg", image)
 
-    cvSaveImage("/Users/kinshuk.bairagi/Pictures/res.jpg", image)
 
+    /// Convert image to gray and blur it
+//
+//    cvtColor(src, src_gray, CV_BGR2GRAY)
+//    blur(src_gray, src_gray, Size(3, 3))
 
-  }
-
-  def smooth(fileName:String, dest:String) ={
-    val image = cvLoadImage(fileName)
-    if (image != null) {
-      cvSmooth(image, image)
-      cvSaveImage(dest, image)
-      cvReleaseImage(image)
-    }
   }
 
   def main(args: Array[String]): Unit = {
-//    smooth("/Users/kinshuk.bairagi/Pictures/kat.jpg", "/Users/kinshuk.bairagi/Pictures/kat-smotth.jpg")
     detectBody("/Users/kinshuk.bairagi/Documents/fashion-hackday/checkouturself/resources/img2.jpg")
   }
 
