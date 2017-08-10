@@ -55,39 +55,31 @@ object IPService {
     val image_skin: Mat = image.clone()
 
     Imgproc.cvtColor(image, image_bw, Imgproc.COLOR_BGR2YCrCb)
-    Core.inRange(image_bw, new Scalar(Y_MIN, Cr_MIN, Cb_MIN), new Scalar(Y_MAX, Cr_MAX, Cb_MAX), image_skin)
+//    Core.inRange(image_bw, new Scalar(Y_MIN, Cr_MIN, Cb_MIN), new Scalar(Y_MAX, Cr_MAX, Cb_MAX), image_skin)
 
 
-    var reactag:Rect = null
-    for ( rect <- hsDetections.toArray) {
-      reactag = rect
-      println("rect" , "x=",reactag.x, "Y=" ,reactag.y)
-      Core.rectangle(image_skin, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
-    }
+
 
     Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
 
-    faceDetector.detectMultiScale(image_skin, faceDetections)
-    for ( rect <- faceDetections.toArray) {
-      Core.rectangle(image_skin, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
-    }
+    faceDetector.detectMultiScale(image_skin, faceDetections, 1.01, 2, Objdetect.CASCADE_FIND_BIGGEST_OBJECT , new Size(), new Size())
+
 
     Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
     println("H=", image_skin.height(), "W=" , image_skin.width)
-    println("rect" , "x=",reactag.x, "Y=" ,reactag.y)
 
-    for (i <- 0 until image_skin.height()){
-      for(j <- 0 until image_skin.width())
-         if(i <  reactag.y)
-           image_skin.put(i,j,0)
-          else if ( i > (reactag.y + reactag.height))
-           image_skin.put(i,j,0)
-         else if(j <  reactag.x)
-        image_skin.put(i,j,0)
-      else if ( j > (reactag.x + reactag.width))
-        image_skin.put(i,j,0)
-
-    }
+//    for (i <- 0 until image_skin.height()){
+//      for(j <- 0 until image_skin.width())
+//         if(i <  reactag.y)
+//           image_skin.put(i,j,0)
+//          else if ( i > (reactag.y + reactag.height))
+//           image_skin.put(i,j,0)
+//         else if(j <  reactag.x)
+//        image_skin.put(i,j,0)
+//      else if ( j > (reactag.x + reactag.width))
+//        image_skin.put(i,j,0)
+//
+//    }
 
     //Highgui.imwrite(s"/Users/$username/Pictures/image_skin.jpg", image_skin)
     Highgui.imwrite(s"/Users/$username/Pictures/image_bw.jpg", image_skin)
@@ -111,7 +103,18 @@ object IPService {
       Imgproc.drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, new Point(0,0) )
     }
 
+    for ( rect <- hsDetections.toArray) {
+      Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
+    }
 
+    for ( rect <- faceDetections.toArray) {
+      Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
+    }
+
+    val point1 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, (faceDetections.toArray.head.y + faceDetections.toArray.head.height) )
+    val point2 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, (hsDetections.toArray.head.y + hsDetections.toArray.head.height) )
+
+    Core.line(drawing, point1, point2, new Scalar(255, 255, 255));
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray.jpg", drawing)
 
 //    Core.rectangle(image, new Point(contours(0).toList.head.x, contours(0).toList.head.y), new Point(contours(0).toList.head.x + contours(0).toList.head.width, rect.y + rect.height), new Scalar(0, 255, 0))
@@ -123,7 +126,7 @@ object IPService {
   }
 
   def main(args: Array[String]): Unit = {
-    detectBody("/Users/hirendra.thakur/practiceWorkspace/checkouturself/resources/img2.jpg")
+    detectBody("/Users/aman.shrivastava/Documents/codebase/checkouturself/resources/img2.jpg")
     //detectBody("/Users/hirendra.thakur/Downloads/1.jpg")
   }
 
