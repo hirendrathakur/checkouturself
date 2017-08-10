@@ -23,7 +23,7 @@ object IPService {
   private val CASCADE_FILE_FULL_BODY = getClass.getResource("/haarcascade_fullbody.xml").getPath
   private val CASCADE_FILE_HS = getClass.getResource("/HS.xml").getPath
   private val CASCADE_FILE_FACE = getClass.getResource("/haarcascade_frontalface_default.xml").getPath
-  private var personShoulderPoints:List[Point] = null
+  private var personShoulderPoints:(Point, Point) = null
   val Y_MIN  = 80
   val Y_MAX  = 255
   val Cb_MIN = 85
@@ -154,7 +154,7 @@ object IPService {
     Core.line(drawingShoulder, point5, point6, new Scalar(255, 255, 255))
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray5.jpg", drawing)
     Highgui.imwrite(s"/Users/$username/Pictures/person_shoulder.jpg", drawingShoulder)
-    personShoulderPoints = List(point5, point6)
+    personShoulderPoints = (point5, point6)
     println(personShoulderPoints)
 
   }
@@ -225,11 +225,11 @@ object IPService {
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
-//    detectBody(imageResources + "people/img2.jpg")
+    detectBody(imageResources + "people/img2.jpg")
 //    copyImage(imageResources + "people/img2.jpg", imageResources + "dresses/dress1.png", imageResources + "result1.png")
 val src = Highgui.imread(imageResources + "people/img2.jpg", Highgui.CV_LOAD_IMAGE_UNCHANGED)
     val dress = Highgui.imread(imageResources + "dresses/dress1.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
-    val res = putOnDress(src, dress, (new Point(613,313), new Point(855,613)), null)
+    val res = putOnDress(src, dress, personShoulderPoints, null)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
   }
