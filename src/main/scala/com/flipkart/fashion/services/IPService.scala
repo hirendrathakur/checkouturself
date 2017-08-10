@@ -97,24 +97,15 @@ object IPService {
 
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray5.jpg", drawing)
 
-//    Core.rectangle(image, new Point(contours(0).toList.head.x, contours(0).toList.head.y), new Point(contours(0).toList.head.x + contours(0).toList.head.width, rect.y + rect.height), new Scalar(0, 255, 0))
-    /// Convert image to gray and blur it
-//
-//    cvtColor(src, src_gray, CV_BGR2GRAY)
-//    blur(src_gray, src_gray, Size(3, 3))
 
   }
 
   def copyImage(personFile: String, dressFile: String, resultFile: String): Unit = {
     val personImage = Highgui.imread(personFile, Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    Imgproc.cvtColor(personImage,personImage, Imgproc.COLOR_RGB2RGBA)
     val dressImage = Highgui.imread(dressFile, Highgui.CV_LOAD_IMAGE_UNCHANGED)
 
-    personImage.copyTo(dressImage)
-    println(dressImage.channels())
-    println(dressImage.get(10,10).toList)
-
-    val output = personImage.clone()
-
+    val output =  Mat.zeros( personImage.size(), CvType.CV_8UC4 )
     IPJService.overlayImage(personImage, dressImage, output, new Point(0,0))
 
     Highgui.imwrite(resultFile, output)
