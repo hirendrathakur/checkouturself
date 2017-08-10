@@ -105,13 +105,22 @@ object IPService {
 
   }
 
-  def copyImage(personFile: String, dressFile: String): Unit = {
+  def copyImage(personFile: String, dressFile: String, resultFile: String): Unit = {
+    val personImage = Highgui.imread(personFile, Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val dressImage = Highgui.imread(dressFile, Highgui.CV_LOAD_IMAGE_UNCHANGED)
+
+    personImage.copyTo(dressImage)
+    Highgui.imwrite(resultFile, dressImage)
+
 
   }
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
-    detectBody(imageResources + "img2.jpg")
+    detectBody(imageResources + "people/img2.jpg")
+    copyImage(imageResources + "people/img2.jpg", imageResources + "dresses/dress1.png", imageResources + "result1.png")
+    copyImage(imageResources + "dresses/dress1.png", imageResources + "people/img2.jpg", imageResources + "result2.png")
+
   }
 
 }
