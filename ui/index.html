@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+
+	<title>CheckoutUrSelf</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style type="text/css">
+		.vcenter {
+			display: inline-block;
+			vertical-align: middle;
+			float: none;
+		}
+		.center-cropped {
+		  object-fit: contain; /* Do not scale the image */
+		  object-position: center; /* Center the image within the element */
+		  height: 600px;
+		  width: 380px;
+		}
+		.thumb-cropped {
+		  object-fit: contain; /* Do not scale the image */
+		  object-position: center; /* Center the image within the element */
+		  height: 100px;
+		}
+		
+	</style>
+</head>
+<body>
+
+
+	
+
+	<div class="container"  >
+
+		<div id="welcome" >
+			<div class="text-center " style=" vertical-align: middle;" >
+				<div class="container">
+					<div style="height: 80px"></div>
+					<h1  style="margin-bottom: 30px">Hey You! </h1>
+
+					<div class="row">
+						<h4 class="heading">Choose a sample model, or <br> Get started with one of your own photo!</h4>
+					</div>
+					<div class="row"  style="margin-top: 30px">
+						<div class="col-xs-6" style="text-align: right;">
+							<a href="javascript:void()" class="choose-profile" data-profile="img1">
+							<img src="../resources/people/img1.jpg" height="200">
+							</a>
+						</div>
+						<div class="col-xs-6" style="text-align: left;">
+						<a href="javascript:void()" class="choose-profile" data-profile="img2">
+							<img src="../resources/people/img2.jpg" height="200">
+							</a>
+						</div>
+
+					</div>
+					<div class="row" style="margin-top: 30px">
+						<p class="text-center"><a class="btn btn-lg btn-default" id="camera" href="javascript:void(0)" role="button">Take Own <span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
+						</a>
+           				 <input type="file" id="capture-input" name="file" accept="image/*" capture="camera" id="camera" class="btn btn-default" style="display: none;" >
+
+						</p>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div id="homescreen"  style="display: none;" >
+			<div class="container-fluid">
+				<div class="row">
+					<img src="" id="preview" class="center-cropped">
+				</div>
+				<div class="row" style="position: absolute; bottom: 0;  background-color: rgba(243, 243, 243, 0.66);">
+					<div class="col-xs-3">
+						<a href="javascript:void()" class="dress-change" data-dressid="dress1">
+							<img src="../resources/dresses/dress1.png" class="thumb-cropped" >
+						</a>
+					</div>
+					<div class="col-xs-3">
+						<a href="javascript:void()" class="dress-change" data-dressid="dress2">
+							<img src="../resources/dresses/dress2.png" class="thumb-cropped" >
+						</a>
+					</div>
+					<div class="col-xs-3">
+						<a href="javascript:void()" class="dress-change" data-dressid="dress3">
+							<img src="../resources/dresses/dress3.png" class="thumb-cropped" >
+						</a>
+					</div>
+					<div class="col-xs-3">
+						<a href="javascript:void()" class="dress-change" data-dressid="dress4">
+							<img src="../resources/dresses/dress4.png" class="thumb-cropped" >
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+		<div class="container-fluid" id="loader" style="display: none; position: absolute;top: 0px;left: 0px;background: rgba(0, 0, 0, 0.2);width: 100%;height: 100%;" > 
+<div class="row">
+					<div class="col-xs-12" >
+						<div style="position: relative;top: 250px; left: 50px">
+							<img   src="loading.gif"> 
+						</div>
+
+					</div>
+				</div>
+
+		</div>
+
+
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"  crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="app.js"></script>
+
+</body>
+</html>
