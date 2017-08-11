@@ -31,12 +31,22 @@ class Routes(implicit mat: Materializer) extends BaseHandler with FileDirective 
             case Success(_) =>
               println(s"Upload Complete ${fileInfo.tmpFilePath}")
               val fileId = IPService.saveUserImage(fileInfo.tmpFilePath)
-              complete(GenericResponse(StatusCodes.OK.intValue, null, Response(s"Upload Accepted: Tmp File Created", Map("fileId" -> fileId))))
+              complete(GenericResponse(StatusCodes.OK.intValue, null, Response(s"Upload Accepted: Tmp File Created", Map("profileId" -> fileId))))
             case Failure(e) =>
               //There was some isse processing the fileupload.
               println("Upload File Error", e)
               complete(GenericResponse(StatusCodes.InternalServerError.intValue, null, Response("There was some error processing your request", Map("debug" -> e.getMessage))))
           }
+        }
+      }
+    } ~ path("getImage") {
+      get {
+        parameters('profileId)
+        { (profileId) => {
+          val destination = IPService.getImage(profileId)
+          val re = HttpResponse(status = StatusCodes.OK, Nil, destination, HttpProtocols.`HTTP/1.1`)
+          complete(re)
+        }
         }
       }
     } ~ path("getTheLook") {
