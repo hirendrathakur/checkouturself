@@ -1,14 +1,20 @@
 package com.flipkart.fashion.services
 
+import java.io.{File, FileInputStream}
 import java.util
 
+import akka.http.scaladsl.model.{ResponseEntity, MediaTypes, HttpEntity}
+import akka.stream.scaladsl.FileIO
 import com.flipkart.fashion.BuildInfo
 import com.flipkart.fashion.services.IPService.testGrid
+import com.flipkart.fashion.utils.StringUtils
 import nu.pattern.OpenCV
+import org.apache.commons.io.IOUtils
 import org.opencv.core._
 import org.opencv.highgui.Highgui
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.{CascadeClassifier, Objdetect}
+import scala.sys.process._
 
 // Draw a bounding box around each face.
 import scala.collection.JavaConversions._
@@ -343,5 +349,30 @@ object IPService {
     val res = putOnDress(src, dress,personShoulderPoints)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
+  }
+
+  def getTheLook(profileId:String, productId: String):ResponseEntity = {
+    val imageResources = BuildInfo.baseDirectory + "/resources/"
+    val person = imageResources + s"people/$profileId.jpg"
+    detectBody(person)
+    val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    println("personShoulderPoints",personShoulderPoints)
+    val dress = Highgui.imread(imageResources + s"dresses/$productId.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val res = putOnDress(src, dress,personShoulderPoints)
+    HttpEntity(MediaTypes.`image/jpeg`, toByte(res))
+  }
+
+  def toByte(image:Mat):Array[Byte] = {
+    val b = new MatOfByte
+    Highgui.imencode(".jpg",image, b)
+    b.toArray
+  }
+
+  def saveUserImage(file:String): String = {
+    val imageResources = BuildInfo.baseDirectory + "/resources/"
+    val fileId = StringUtils.generateRandomStr(6)
+    val copyCmd = s"cp $file $imageResources/people/$fileId.jpg"
+    val cmdOutput = copyCmd.!!
+    fileId
   }
 }
