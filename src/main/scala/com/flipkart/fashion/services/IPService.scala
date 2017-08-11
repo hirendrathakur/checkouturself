@@ -278,12 +278,7 @@ object IPService {
 
     println("resizeImagewidth", resizeimage.width())
 
-
-<<<<<<< HEAD
-    val startPOint = new Point( neckPoint.x - shoulderMidpoint.x ,neckPoint.y  - shoulderMidpoint.y-30)
-=======
     val startPOint = new Point( neckPoint.x - shoulderMidpoint.x ,neckPoint.y  - shoulderMidpoint.y - 40)
->>>>>>> abd8bf6aa8f9b34e4917fde2450121762f3dbff4
 //    val startPOint =  new Point(shoulder._1.x - newStaps._1.x + 25 ,shoulder._1.y - newStaps._1.y - 20)  //new Point(0,0)
 
     for(i <- startPOint.x.toInt to startPOint.x.toInt + resizeimage.width()){
