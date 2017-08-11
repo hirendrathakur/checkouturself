@@ -341,7 +341,7 @@ object IPService {
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
-    val person = imageResources + "people/img1.jpg"
+    val person = imageResources + "people/img2.jpg"
     detectBody(person)
     val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
     println("personShoulderPoints",personShoulderPoints)
