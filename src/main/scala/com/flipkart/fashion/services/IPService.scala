@@ -245,40 +245,41 @@ object IPService {
     val strap = shoulders( dress)
     val strapDistace = distance(strap._1, strap._2)
     println("shoulderDistance",shoulderDistance)
-//    println("strapDistance",strapDistance)
+    println("strapDistance",strapDistace)
     val (newDHeight, newDWdith) = {
-
-      val ratio =   dress.height().toDouble / dress.width()
+      val targetWidth = shoulderDistance + 150
+      val ratio = targetWidth / dress.width()
+      val targetHeight = dress.height().toDouble * ratio
       println(ratio)
-
-      val d = if (strapDistace > shoulderDistance ) strapDistace/ shoulderDistance else shoulderDistance / strapDistace
-      val targetWidth =    dress.width()  / d
-      val targetHeight = targetWidth * ratio
       targetHeight -> targetWidth
 
 
 
     }
 
-    println(dress.height(),dress.width())
-    println(newDHeight,newDWdith)
+    println("actual dress size",dress.height(),dress.width())
+    println("new dress size", newDHeight,newDWdith)
 
     val resizeimage = new Mat
     Imgproc.resize(dress, resizeimage, new Size(newDWdith, newDHeight))
+    println("resizeImage", resizeimage.size())
     Imgproc.cvtColor(person,person, Imgproc.COLOR_RGB2RGBA)
 
     val finalImage = person.clone()
     println("shoulderPOint, Overlay", shoulder._1)
-
+    println("finalImage", finalImage.size())
     val newStaps = shoulders(resizeimage)
+    println("newStaps", newStaps)
 
     //
     val neckPoint = neckMidPoint(person)
+    println("neckmidpoint", neckPoint)
     val shoulderMidpoint =shouldMid(resizeimage)
 
+    println("resizeImagewidth", resizeimage.width())
 
 
-    val startPOint = new Point( neckPoint.x - shoulderMidpoint.x ,neckPoint.y  - shoulderMidpoint.y)
+    val startPOint = new Point( neckPoint.x - shoulderMidpoint.x ,neckPoint.y  - shoulderMidpoint.y-25)
 //    val startPOint =  new Point(shoulder._1.x - newStaps._1.x + 25 ,shoulder._1.y - newStaps._1.y - 20)  //new Point(0,0)
 
     for(i <- startPOint.x.toInt to startPOint.x.toInt + resizeimage.width()){
@@ -333,7 +334,7 @@ object IPService {
     detectBody(person)
     val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
     println("personShoulderPoints",personShoulderPoints)
-    val dress = Highgui.imread(imageResources + "dresses/dress5.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val dress = Highgui.imread(imageResources + "dresses/dress3.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
     val res = putOnDress(src, dress,personShoulderPoints)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
