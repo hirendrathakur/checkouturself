@@ -247,7 +247,8 @@ object IPService {
     println("shoulderDistance",shoulderDistance)
     println("strapDistance",strapDistace)
     val (newDHeight, newDWdith) = {
-      val targetWidth = shoulderDistance + (dress.width()-strapDistace)/2.2
+      val d = if(strapDistace> shoulderDistance) strapDistace/ shoulderDistance else shoulderDistance/strapDistace
+      val targetWidth = shoulderDistance + (dress.width()-strapDistace)/d
       val ratio = targetWidth / dress.width()
       val targetHeight = dress.height().toDouble * ratio
       println(ratio)
@@ -333,7 +334,7 @@ object IPService {
     detectBody(person)
     val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
     println("personShoulderPoints",personShoulderPoints)
-    val dress = Highgui.imread(imageResources + "dresses/dress3.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val dress = Highgui.imread(imageResources + "dresses/dress4.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
     val res = putOnDress(src, dress,personShoulderPoints)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
