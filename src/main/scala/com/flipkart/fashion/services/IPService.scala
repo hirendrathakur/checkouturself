@@ -129,8 +129,8 @@ object IPService {
 
   }
 
-  def getShoulderStartingX(drawing:Mat, end:Int, intersectY:Int): Int = {
-    for (i <- 0 until end) {
+  def getShoulderStartingX(drawing:Mat, start:Int,  end:Int, intersectY:Int): Int = {
+    for (i <- start until end) {
       if (drawing.get(intersectY,i).toList != List(0.0, 0.0, 0.0)) {
         return i
       }
@@ -138,8 +138,8 @@ object IPService {
     0
   }
 
-  def getShoulderEndingX(drawing:Mat, end:Int, intersectY:Int): Int = {
-    for (i <- end to 0 by -1) {
+  def getShoulderEndingX(drawing:Mat, start:Int,  end:Int, intersectY:Int): Int = {
+    for (i <- end to start by -1) {
       if (drawing.get(intersectY,i).toList != List(0.0, 0.0, 0.0)) {
         return i
       }
@@ -209,8 +209,8 @@ object IPService {
 
     val intersectX = point3.x + (point4.x-point3.x)/2
     val intersectY = point1.y + (point2.y-point1.y)/2
-    val shoulderStartX = getShoulderStartingX(drawingShoulder, intersectX.toInt, intersectY.toInt)
-    val shoulderEndX = getShoulderEndingX(drawingShoulder, drawingShoulder.cols()-1, intersectY.toInt)
+    val shoulderStartX = getShoulderStartingX(drawingShoulder,  point3.x.toInt, intersectX.toInt, intersectY.toInt)
+    val shoulderEndX = getShoulderEndingX(drawingShoulder,intersectX.toInt ,  point4.x.toInt , intersectY.toInt)
 
     val point5 = new Point(shoulderStartX, intersectY)
     val point6 = new Point(shoulderEndX, intersectY)
@@ -258,9 +258,6 @@ object IPService {
       val targetHeight = dress.height().toDouble * ratio
       println(ratio)
       targetHeight -> targetWidth
-
-
-
     }
 
     println("actual dress size",dress.height(),dress.width())
@@ -335,11 +332,11 @@ object IPService {
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
-    val person = imageResources + "people/img1.jpg"
+    val person = imageResources + "people/img2.jpg"
     detectBody(person)
     val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
     println("personShoulderPoints",personShoulderPoints)
-    val dress = Highgui.imread(imageResources + "dresses/dress1.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val dress = Highgui.imread(imageResources + "dresses/dress2.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
     val res = putOnDress(src, dress,personShoulderPoints)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
