@@ -108,7 +108,7 @@ object IPService {
     val hsDetector = new CascadeClassifier(CASCADE_FILE_HS)
     val faceDetector = new CascadeClassifier(CASCADE_FILE_FACE)
 
-    val hsDetections = new MatOfRect
+    var hsDetections = new MatOfRect
     val faceDetections = new MatOfRect
     hsDetector.detectMultiScale(image, hsDetections)
 
@@ -121,10 +121,11 @@ object IPService {
     Highgui.imwrite(s"/Users/$username/Pictures/image_bw.jpg", image_bw)
     Imgproc.blur(image_bw, image_bw, new Size(3,3))
     val canny_out: Mat = image.clone()
+    hsDetections = new MatOfRect(hsDetections.toArray.filter(hs => hs.contains(faceDetections.toArray.head.tl())): _*)
 
     val distance = hsDetections.toArray.head.y + hsDetections.toArray.head.height - (faceDetections.toArray.head.y + faceDetections.toArray.head.height)
 
-    new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
+    new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 4)
 
   }
 
@@ -154,7 +155,7 @@ object IPService {
 
     val imageHeight = image.height()
 
-    val hsDetections = new MatOfRect
+    var hsDetections = new MatOfRect
     val faceDetections = new MatOfRect
     hsDetector.detectMultiScale(image, hsDetections)
 //    bodyDetector.detectMultiScale(image, bodyDetections, 1.01, 2, Objdetect.CASCADE_SCALE_IMAGE , new Size(200,humanHeight), new Size())
@@ -190,20 +191,21 @@ object IPService {
     for ( rect <- hsDetections.toArray) {
       Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
     }
-
+    hsDetections = new MatOfRect(hsDetections.toArray.filter(hs => hs.contains(faceDetections.toArray.head.tl())): _*)
+    println("head and should size = " + hsDetections.toArray.size)
     for ( rect <- faceDetections.toArray) {
       Core.rectangle(drawing, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(255, 255, 255))
     }
+    println("face size = " + faceDetections.toArray.size)
 
     val distance = hsDetections.toArray.head.y + hsDetections.toArray.head.height - (faceDetections.toArray.head.y + faceDetections.toArray.head.height)
     val point1 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, faceDetections.toArray.head.y + faceDetections.toArray.head.height )
     val point2 = new Point(faceDetections.toArray.head.x + faceDetections.toArray.head.width / 2, hsDetections.toArray.head.y + hsDetections.toArray.head.height )
+    val point3 = new Point(hsDetections.toArray.head.x, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 4)
+    val point4 = new Point(hsDetections.toArray.head.x + hsDetections.toArray.head.width, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 4)
 
-    val point3 = new Point(hsDetections.toArray.head.x, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
-    val point4 = new Point(hsDetections.toArray.head.x + hsDetections.toArray.head.width, faceDetections.toArray.head.y + faceDetections.toArray.head.height + distance / 2)
-
-    //Core.line(drawing, point1, point2, new Scalar(255, 255, 255))
-    //Core.line(drawing, point3, point4, new Scalar(255, 255, 255))
+//    Core.line(drawing, point1, point2, new Scalar(255, 255, 255))
+//    Core.line(drawing, point3, point4, new Scalar(255, 255, 255))
 
     val intersectX = point3.x + (point4.x-point3.x)/2
     val intersectY = point1.y + (point2.y-point1.y)/2
@@ -212,6 +214,9 @@ object IPService {
 
     val point5 = new Point(shoulderStartX, intersectY)
     val point6 = new Point(shoulderEndX, intersectY)
+
+    Core.line(drawing, point5, point6, new Scalar(255, 255, 255))
+
 
     Core.line(drawingShoulder, point5, point6, new Scalar(255, 255, 255))
     Highgui.imwrite(s"/Users/$username/Pictures/result_gray5.jpg", drawing)
@@ -279,7 +284,7 @@ object IPService {
 
     println("resizeImagewidth", resizeimage.width())
 
-    val startPOint = new Point( neckPoint.x - shoulderMidpoint.x ,neckPoint.y  - shoulderMidpoint.y-20)
+    val startPOint = new Point( neckPoint.x - shoulderMidpoint.x ,neckPoint.y  - shoulderMidpoint.y)
 //    val startPOint =  new Point(shoulder._1.x - newStaps._1.x + 25 ,shoulder._1.y - newStaps._1.y - 20)  //new Point(0,0)
 
     for(i <- startPOint.x.toInt to startPOint.x.toInt + resizeimage.width()){
@@ -330,11 +335,11 @@ object IPService {
 
   def main(args: Array[String]): Unit = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
-    val person = imageResources + "people/img2.jpg"
+    val person = imageResources + "people/img1.jpg"
     detectBody(person)
     val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
     println("personShoulderPoints",personShoulderPoints)
-    val dress = Highgui.imread(imageResources + "dresses/dress4.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    val dress = Highgui.imread(imageResources + "dresses/dress1.png", Highgui.CV_LOAD_IMAGE_UNCHANGED)
     val res = putOnDress(src, dress,personShoulderPoints)
     Highgui.imwrite(s"/Users/$username/Pictures/showoff.jpg", res)
 
