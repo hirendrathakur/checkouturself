@@ -8,6 +8,9 @@
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<style type="text/css">
+		html, body {
+			height: 100%;
+		}
 		.vcenter {
 			display: inline-block;
 			vertical-align: middle;
@@ -24,6 +27,17 @@
 		  object-position: center; /* Center the image within the element */
 		  height: 100px;
 		}
+
+		.share {
+			float: right;
+		    background: #00BCD4;
+		    border: 0;
+		    margin-top: 5px;
+		    position: absolute;
+		    right: 0;
+		    color: #fff;
+		    padding: 2px 10px;
+		}
 		
 	</style>
 </head>
@@ -32,26 +46,31 @@
 
 	
 
-	<div class="container"  >
+	<div class="container" style="padding-left: 0; padding-right:0;" >
 
 		<div id="welcome" >
 			<div class="text-center " style=" vertical-align: middle;" >
 				<div class="container">
-					<div style="height: 80px"></div>
+					<img src="canvas.png" style="height: 160px;">
 					<h1  style="margin-bottom: 30px">Hey You! </h1>
 
 					<div class="row">
-						<h4 class="heading">Choose a sample model, or <br> Get started with one of your own photo!</h4>
+						<h4 class="heading">Choose a sample figure or <br> Get started with one of your own photo!</h4>
 					</div>
-					<div class="row"  style="margin-top: 30px">
-						<div class="col-xs-6" style="text-align: right;">
+					<div class="row"  style="margin-top: 10px">
+						<div class="col-xs-4" >
 							<a href="javascript:void()" class="choose-profile" data-profile="img1">
 							<img src="../resources/people/img1.jpg" height="200">
 							</a>
 						</div>
-						<div class="col-xs-6" style="text-align: left;">
+						<div class="col-xs-4" >
 						<a href="javascript:void()" class="choose-profile" data-profile="img2">
 							<img src="../resources/people/img2.jpg" height="200">
+							</a>
+						</div>
+						<div class="col-xs-4">
+						<a href="javascript:void()" class="choose-profile" data-profile="img3">
+							<img src="../resources/people/img3.jpg" height="200">
 							</a>
 						</div>
 
@@ -69,12 +88,13 @@
 		</div>
 
 
-		<div id="homescreen"  style="display: none;" >
-			<div class="container-fluid">
+		<div id="homescreen"  style="display: none; overflow: hidden;" >
+			<div class="container-fluid" style="overflow: hidden;">
+				<button class="share">Share</button>
 				<div class="row">
 					<img src="" id="preview" class="center-cropped">
 				</div>
-				<div class="row" style="position: absolute; bottom: 0;  background-color: rgba(243, 243, 243, 0.66);">
+				<div class="row" style="position: absolute; bottom: 0;  background-color: rgba(243, 243, 243, 0.66);width: 100%;border-top: 1px solid #eee;padding-top: 10px;">
 					<div class="col-xs-3">
 						<a href="javascript:void()" class="dress-change" data-dressid="dress1">
 							<img src="../resources/dresses/dress1.png" class="thumb-cropped" >
@@ -101,11 +121,11 @@
 	</div>
 
 
-		<div class="container-fluid" id="loader" style="display: none; position: absolute;top: 0px;left: 0px;background: rgba(0, 0, 0, 0.2);width: 100%;height: 100%;" > 
+		<div class="container-fluid" id="loader" style="display: none; position: absolute;top: 0px;left: 0px;background: rgba(0, 0, 0, 0.1);width: 100%;height: 100%;" > 
 <div class="row">
 					<div class="col-xs-12" >
-						<div style="position: relative;top: 250px; left: 50px">
-							<img   src="loading.gif"> 
+						<div style="position: relative;top: 200px; left: 125px">
+							<img  src="Flickr.svg" style="height: 120px;"> 
 						</div>
 
 					</div>
