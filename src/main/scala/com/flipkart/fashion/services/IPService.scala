@@ -368,8 +368,17 @@ object IPService {
   def saveUserImage(file:String): String = {
     val imageResources = BuildInfo.baseDirectory + "/resources/"
     val fileId = StringUtils.generateRandomStr(6)
+    println("fileId", fileId)
     val copyCmd = s"cp $file $imageResources/people/$fileId.jpg"
     val cmdOutput = copyCmd.!!
+    println("copied file", copyCmd)
     fileId
+  }
+
+  def getImage(profileId:String):ResponseEntity = {
+    val imageResources = BuildInfo.baseDirectory + "/resources/"
+    val person = imageResources + s"people/$profileId.jpg"
+    val src = Highgui.imread(person, Highgui.CV_LOAD_IMAGE_UNCHANGED)
+    HttpEntity(MediaTypes.`image/jpeg`, toByte(src))
   }
 }
